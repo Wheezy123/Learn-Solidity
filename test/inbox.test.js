@@ -3,7 +3,8 @@ const ganache = require('ganache-cli');
 // below is constructor, used to create instances of the Web3 library. constructor vars are Capitalized
 const Web3 = require('web3');
 // instance var of web3 below, lower case == instance var
-const web3 = new Web3(ganache.provider());
+const provider = ganache.provider();
+const web3 = new Web3(provider);
 const { interface, bytecode } = require('../compile');
 
 
@@ -38,21 +39,39 @@ let inbox;
 
 beforeEach(async () => {
   // Get a list of all accounts
-  // Use one of those accounts to deploy the contract
-
   // web3.eth.getAccounts().then(fetchedAccounts => {
   //   console.log(fetchedAccounts);
   // })
+  
+  // same as above using await async syntax
+  // *** all web3 functions will return a promise that needs to be resolved!
   accounts = await web3.eth.getAccounts();
 
-  // deploy contract
+  // Use one of those accounts to deploy contract
   inbox = await new web3.eth.Contract(JSON.parse(interface))
+                              // arguments array is 1 to 1 feeding of args listed into contract Constructor function
     .deploy({ data: bytecode, arguments: ['Hi there!']})
-    .send({ from: accounts[0], gas:'1000000' });
+    .send({ from: accounts[0], gas:'1000000' }
+  );
+
+    inbox.setProvider(provider);
 });
 
 describe("Inbox", () => {
   it("deploys a contract", () => {
-    console.log(inbox);
+    assert.ok(inbox.options.address);
+  });
+
+  it(" has a default message", async () => {
+    const message = await inbox.methods.message().call();
   });
 });
+
+
+
+
+
+
+
+
+
