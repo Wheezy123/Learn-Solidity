@@ -50,7 +50,7 @@ beforeEach(async () => {
   // Use one of those accounts to deploy contract
   inbox = await new web3.eth.Contract(JSON.parse(interface))
                               // arguments array is 1 to 1 feeding of args listed into contract Constructor function
-    .deploy({ data: bytecode, arguments: ['Hi there!']})
+    .deploy({ data: bytecode, arguments: ['Im writing smart contracts w00t!']})
     .send({ from: accounts[0], gas:'1000000' }
   );
 
@@ -64,6 +64,7 @@ describe("Inbox", () => {
 
   it("has a default message", async () => {
     const message = await inbox.methods.message().call();
+    assert.equal(message, 'Im writing smart contracts w00t!');
   });
 
   it("can change the message", async () => {
